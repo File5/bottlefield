@@ -106,6 +106,28 @@ class GameView(arcade.View):
             for b in hit:
                 self.bottle_list.remove(b)
                 self.broken_bottle_list.append(self.new_broken_bottle(b))
+            if not self.bottle_list:
+                self.window.show_win_view()
+
+
+class WinView(arcade.View):
+    def __init__(self, window: arcade.Window = None):
+        super().__init__(window)
+
+    def setup(self):
+        pass
+
+    def on_show(self):
+        arcade.set_background_color(arcade.color.DARK_GREEN)
+
+    def on_draw(self):
+        arcade.start_render()
+        arcade.draw_text("ETO POBEDA", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2,
+            arcade.color.WHITE, font_name='Kenney High Square', font_size=50, anchor_x="center")
+
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            self.window.show_game_view()
 
 
 class MyGame(arcade.Window):
@@ -120,6 +142,7 @@ class MyGame(arcade.Window):
         super().__init__(width, height)
         self.game_view = GameView(self)
         self.splash_view = SplashView(self)
+        self.win_view = WinView(self)
 
     def setup(self):
         self.show_splash_view()
@@ -131,6 +154,10 @@ class MyGame(arcade.Window):
     def show_splash_view(self):
         self.splash_view.setup()
         self.show_view(self.splash_view)
+
+    def show_win_view(self):
+        self.win_view.setup()
+        self.show_view(self.win_view)
 
 
 def main():
