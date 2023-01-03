@@ -5,6 +5,9 @@ Show how to use a two-dimensional list/array to back the display of a
 grid on-screen.
 """
 import arcade
+import random
+
+FIELD_WIDTH, FIELD_HEIGHT = 20, 7
 
 # Do the math to figure out our screen dimensions
 SCREEN_WIDTH = 640
@@ -41,20 +44,50 @@ class GameView(arcade.View):
     def setup(self):
         self.bottle = self.new_bottle(SCREEN_WIDTH / 2 - 11, SCREEN_HEIGHT / 2)
         self.bottle_broken = self.new_bottle(SCREEN_WIDTH / 2 + 11, SCREEN_HEIGHT / 2, broken=True)
+        self.bottle_list = arcade.SpriteList()
+        self.broken_bottle_list = arcade.SpriteList()
+        self.generate_field()
 
-    def new_bottle(self, x, y, broken=False):
+    def generate_field(self):
+        shift_lim_x = 15
+        shift_lim_y = 15
+        padding_x = (SCREEN_WIDTH // FIELD_WIDTH) // 2
+        padding_y = (SCREEN_HEIGHT // FIELD_HEIGHT) // 2
+        for y in range(padding_y, SCREEN_HEIGHT, SCREEN_HEIGHT // FIELD_HEIGHT):
+            for x in range(padding_x, SCREEN_WIDTH, SCREEN_WIDTH // FIELD_WIDTH):
+                rotation = random.randint(0, 11) * 30
+                shift_x = random.randint(-shift_lim_x, shift_lim_x)
+                shift_y = random.randint(-shift_lim_y, shift_lim_y)
+                if random.randint(0, 1) == 0:
+                    self.bottle_list.append(self.new_bottle(x + shift_x, y + shift_y, angle=rotation))
+                else:
+                    self.bottle_list.append(self.new_bottle(x + shift_x, y + shift_y, angle=rotation, broken=False))
+
+    def new_bottle(self, x, y, angle=0, broken=False):
         if broken:
             bottle = arcade.Sprite("assets/bottle0.png", scale=0.25)
         else:
             bottle = arcade.Sprite("assets/bottle1.png", scale=0.25)
         bottle.center_x = x
         bottle.center_y = y
+        bottle.angle = angle
         return bottle
+
+    def new_broken_bottle(self, bottle):
+        broken_bottle = self.new_bottle(bottle.center_x, bottle.center_y, angle=bottle.angle, broken=True)
+        return broken_bottle
 
     def on_draw(self):
         arcade.draw_lrtb_rectangle_filled(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, (92, 64, 51))
-        self.bottle.draw()
-        self.bottle_broken.draw()
+        self.bottle_list.draw()
+        self.broken_bottle_list.draw()
+
+    def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
+        if button == arcade.MOUSE_BUTTON_LEFT:
+            hit = arcade.get_sprites_at_point((x, y), self.bottle_list)
+            for b in hit:
+                self.bottle_list.remove(b)
+                self.broken_bottle_list.append(self.new_broken_bottle(b))
 
 
 class MyGame(arcade.Window):
