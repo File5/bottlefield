@@ -39,10 +39,22 @@ class GameView(arcade.View):
         super().__init__(window)
 
     def setup(self):
-        pass
+        self.bottle = self.new_bottle(SCREEN_WIDTH / 2 - 11, SCREEN_HEIGHT / 2)
+        self.bottle_broken = self.new_bottle(SCREEN_WIDTH / 2 + 11, SCREEN_HEIGHT / 2, broken=True)
+
+    def new_bottle(self, x, y, broken=False):
+        if broken:
+            bottle = arcade.Sprite("assets/bottle0.png", scale=0.25)
+        else:
+            bottle = arcade.Sprite("assets/bottle1.png", scale=0.25)
+        bottle.center_x = x
+        bottle.center_y = y
+        return bottle
 
     def on_draw(self):
         arcade.draw_lrtb_rectangle_filled(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, (92, 64, 51))
+        self.bottle.draw()
+        self.bottle_broken.draw()
 
 
 class MyGame(arcade.Window):
