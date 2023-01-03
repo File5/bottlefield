@@ -46,6 +46,8 @@ class GameView(arcade.View):
         self.bottle_broken = self.new_bottle(SCREEN_WIDTH / 2 + 11, SCREEN_HEIGHT / 2, broken=True)
         self.bottle_list = arcade.SpriteList()
         self.broken_bottle_list = arcade.SpriteList()
+
+        self.bottle_sound = arcade.load_sound("assets/glass-breaking.wav")
         self.generate_field()
 
     def generate_field(self):
@@ -85,6 +87,8 @@ class GameView(arcade.View):
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         if button == arcade.MOUSE_BUTTON_LEFT:
             hit = arcade.get_sprites_at_point((x, y), self.bottle_list)
+            if hit:
+                arcade.play_sound(self.bottle_sound, 0.1)
             for b in hit:
                 self.bottle_list.remove(b)
                 self.broken_bottle_list.append(self.new_broken_bottle(b))
