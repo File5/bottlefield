@@ -42,12 +42,14 @@ class GameView(arcade.View):
         super().__init__(window)
 
     def setup(self):
+        self.window.set_mouse_visible(False)
         self.bottle = self.new_bottle(SCREEN_WIDTH / 2 - 11, SCREEN_HEIGHT / 2)
         self.bottle_broken = self.new_bottle(SCREEN_WIDTH / 2 + 11, SCREEN_HEIGHT / 2, broken=True)
         self.bottle_list = arcade.SpriteList()
         self.broken_bottle_list = arcade.SpriteList()
 
         self.bottle_sound = arcade.load_sound("assets/glass-breaking.wav")
+        self.mouse_pos = (0, 0)
         self.generate_field()
 
     def generate_field(self):
@@ -79,10 +81,22 @@ class GameView(arcade.View):
         broken_bottle = self.new_bottle(bottle.center_x, bottle.center_y, angle=bottle.angle, broken=True)
         return broken_bottle
 
+    def draw_crosshair(self):
+        x, y = self.mouse_pos
+        pad = 3
+        arcade.draw_line(x - 10, y, x - pad, y, arcade.color.RED, 2)
+        arcade.draw_line(x + 10, y, x + pad, y, arcade.color.RED, 2)
+        arcade.draw_line(x, y - 10, x, y - pad, arcade.color.RED, 2)
+        arcade.draw_line(x, y + 10, x, y + pad, arcade.color.RED, 2)
+
     def on_draw(self):
         arcade.draw_lrtb_rectangle_filled(0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, (92, 64, 51))
         self.bottle_list.draw()
         self.broken_bottle_list.draw()
+        self.draw_crosshair()
+
+    def on_mouse_motion(self, x: int, y: int, dx: int, dy: int):
+        self.mouse_pos = (x, y)
 
     def on_mouse_press(self, x: int, y: int, button: int, modifiers: int):
         if button == arcade.MOUSE_BUTTON_LEFT:
